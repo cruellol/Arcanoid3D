@@ -75,7 +75,7 @@ namespace Arcanoid
                             BlockedSides.Remove(Sides.Down);
                         }
                     }
-                    if(move.y < 0)
+                    if (move.y < 0)
                     {
                         if (BlockedSides.Contains(Sides.Down))
                         {
@@ -169,8 +169,8 @@ namespace Arcanoid
             _speedY *= slowing;
             _speedZ *= slowing;
             var pos = transform.position;
-            pos.y += _speedY;
-            pos.z += _speedZ;
+            pos.y += _speedY * Time.deltaTime;
+            pos.z += _speedZ * Time.deltaTime;
             transform.position = pos;
         }
 

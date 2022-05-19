@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Arcanoid
@@ -10,7 +11,9 @@ namespace Arcanoid
         [SerializeField]
         private GameObject _player1 = null;
         [SerializeField]
-        private GameObject _edge1=null;
+        private GameObject _player2 = null;
+        [SerializeField]
+        private GameObject _edge1 = null;
         private EdgeScript _edgeScript1 = null;
         [SerializeField]
         private GameObject _edge2 = null;
@@ -20,25 +23,43 @@ namespace Arcanoid
         private List<GameObject> _boxes;
         private int _maxBoxes;
         [SerializeField]
-        private float _levelShrinkCoef=0.9f;
+        private float _levelShrinkCoef = 0.9f;
+        [SerializeField]
+        private GameObject _player1HealthPanel;
+        [SerializeField]
+        private GameObject _player2HealthPanel;
+        [SerializeField]
+        private GameObject _heartImage;
+
+        [SerializeField]
+        private int _maxHealth;
+        private int _player1Health;
+        private int _player2Health;
+
         // Start is called before the first frame update
         void Start()
         {
             _roomGenerator = GetComponent<RoomGeneration>();
-            _boxes=GetBoxes();
+            _boxes = GetBoxes();
             _maxBoxes = _roomGenerator.GetMaxBoxCount();
             _ballsMove = _ball.GetComponent<BallBehavior>();
             _ballsMove.BoxToKill += _ballsMove_BoxToKill;
             _edgeScript1 = _edge1.GetComponent<EdgeScript>();
-            _edgeScript1.EdgeTouch += _edgeScript1_EdgeTouch;
+            _edgeScript1.EdgeTouch += _edgeScript_EdgeTouch;
             _edgeScript2 = _edge2.GetComponent<EdgeScript>();
-            _edgeScript2.EdgeTouch += _edgeScript1_EdgeTouch;
+            _edgeScript2.EdgeTouch += _edgeScript_EdgeTouch;
 
             if (_boxes.Count < _maxBoxes)
             {
                 GenerateNew();
             }
-            
+            else
+            {
+                _player1Health = _maxHealth;
+                _player2Health = _maxHealth;
+                CheckHealthAndFill();
+            }
+
         }
 
         public void GenerateHarder()
@@ -50,9 +71,53 @@ namespace Arcanoid
         }
         public void GenerateNew()
         {
+            _player1Health = _maxHealth;
+            _player2Health = _maxHealth;
+            CheckHealthAndFill();
             _roomGenerator.GenerateRoom();
-            _boxes = GetBoxes(); 
+            _boxes = GetBoxes();
             ResetBall();
+        }
+
+        private void CheckHealthAndFill()
+        {
+            if(_player1Health>0 && _player2Health > 0)
+            {
+                ResetHealthForPlayer(_player1HealthPanel, _player1Health);
+                ResetHealthForPlayer(_player2HealthPanel, _player2Health);
+            }
+            else
+            {
+                CloseGame();
+            }
+        }
+
+        private static void CloseGame()
+        {
+            if (Application.isEditor)
+            {
+                UnityEditor.EditorApplication.isPlaying = false;
+            }
+            else
+            {
+                Application.Quit();
+            }
+        }
+
+        private void ResetHealthForPlayer(GameObject healthPanel, int healthCount)
+        {
+            foreach (Transform child in healthPanel.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            for (int i = 0; i < healthCount; i++)
+            {
+                var newheart = GameObject.Instantiate(_heartImage);
+                newheart.transform.SetParent(healthPanel.transform);
+                newheart.transform.localScale = new Vector3(1, 1, 1);
+                newheart.transform.localPosition = Vector3.zero;
+                newheart.transform.localRotation = Quaternion.Euler(Vector3.zero);
+            }
         }
 
         private List<GameObject> GetBoxes()
@@ -83,8 +148,17 @@ namespace Arcanoid
             }
         }
 
-        private void _edgeScript1_EdgeTouch(object sender, System.EventArgs e)
+        private void _edgeScript_EdgeTouch(object sender, System.EventArgs e)
         {
+            if (sender as EdgeScript == _edgeScript1)
+            {
+                _player1Health--;
+            }
+            else
+            {
+                _player2Health--;
+            }
+            CheckHealthAndFill();
             ResetBall();
         }
         private void ResetBall()
@@ -94,6 +168,14 @@ namespace Arcanoid
             _ball.transform.localRotation = Quaternion.Euler(0, -90, 0);
             _ballsMove.SetStick(true);
             _ballsMove.ResetSpeed();
+            var pos1 = _player1.transform.localPosition;
+            pos1.y = 0;
+            pos1.z = 0;
+            _player1.transform.localPosition = pos1;
+            var pos2 = _player2.transform.localPosition;
+            pos2.y = 0;
+            pos2.z = 0;
+            _player2.transform.localPosition = pos2;
         }
-    } 
+    }
 }
