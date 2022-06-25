@@ -26,14 +26,31 @@ namespace Arcanoid
             inputs = new GameInputs();
             inputs.Enable();
             inputs.NewMap.Release.performed += Release_performed;
+#if UNITY_EDITOR
+            inputs.NewMap.ReleaseEditor.performed += Release_performed;
+#endif
         }
         private void Start()
         {
             if (_player == Players.Player1)
             {
-                _ballsMove = _ball.GetComponent<BallBehavior>();
+                if (_ball != null)
+                {
+                    _ballsMove = _ball.GetComponent<BallBehavior>();
+                }
+                else
+                {
+                    DebugToFile.Log("Add ball link!");
+                }
             }
-            _platformBehavior = _platform.GetComponent<PlatformBehavior>();
+            if (_platform != null)
+            {
+                _platformBehavior = _platform.GetComponent<PlatformBehavior>();
+            }
+            else
+            {
+                DebugToFile.Log("Add _platform link!");
+            }            
             _platformBehavior.Collide += _platformBehavior_Collide;
         }
 
@@ -51,6 +68,7 @@ namespace Arcanoid
         {
             if (_player == Players.Player1)
             {
+                DebugToFile.Log("Ball released");
                 _ball.transform.parent = null;
                 _ballsMove.SetStick(false);
             }

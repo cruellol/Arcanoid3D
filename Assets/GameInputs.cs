@@ -55,6 +55,15 @@ namespace Arcanoid
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ReleaseEditor"",
+                    ""type"": ""Button"",
+                    ""id"": ""f1042334-820e-48da-a651-56b92b0d14ac"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -178,6 +187,17 @@ namespace Arcanoid
                     ""action"": ""Release"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9a2a93b8-2234-43c9-b3b1-65ed296fbe9a"",
+                    ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ReleaseEditor"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -189,6 +209,7 @@ namespace Arcanoid
             m_NewMap_Movement1 = m_NewMap.FindAction("Movement1", throwIfNotFound: true);
             m_NewMap_Movement2 = m_NewMap.FindAction("Movement2", throwIfNotFound: true);
             m_NewMap_Release = m_NewMap.FindAction("Release", throwIfNotFound: true);
+            m_NewMap_ReleaseEditor = m_NewMap.FindAction("ReleaseEditor", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -251,6 +272,7 @@ namespace Arcanoid
         private readonly InputAction m_NewMap_Movement1;
         private readonly InputAction m_NewMap_Movement2;
         private readonly InputAction m_NewMap_Release;
+        private readonly InputAction m_NewMap_ReleaseEditor;
         public struct NewMapActions
         {
             private @GameInputs m_Wrapper;
@@ -258,6 +280,7 @@ namespace Arcanoid
             public InputAction @Movement1 => m_Wrapper.m_NewMap_Movement1;
             public InputAction @Movement2 => m_Wrapper.m_NewMap_Movement2;
             public InputAction @Release => m_Wrapper.m_NewMap_Release;
+            public InputAction @ReleaseEditor => m_Wrapper.m_NewMap_ReleaseEditor;
             public InputActionMap Get() { return m_Wrapper.m_NewMap; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -276,6 +299,9 @@ namespace Arcanoid
                     @Release.started -= m_Wrapper.m_NewMapActionsCallbackInterface.OnRelease;
                     @Release.performed -= m_Wrapper.m_NewMapActionsCallbackInterface.OnRelease;
                     @Release.canceled -= m_Wrapper.m_NewMapActionsCallbackInterface.OnRelease;
+                    @ReleaseEditor.started -= m_Wrapper.m_NewMapActionsCallbackInterface.OnReleaseEditor;
+                    @ReleaseEditor.performed -= m_Wrapper.m_NewMapActionsCallbackInterface.OnReleaseEditor;
+                    @ReleaseEditor.canceled -= m_Wrapper.m_NewMapActionsCallbackInterface.OnReleaseEditor;
                 }
                 m_Wrapper.m_NewMapActionsCallbackInterface = instance;
                 if (instance != null)
@@ -289,6 +315,9 @@ namespace Arcanoid
                     @Release.started += instance.OnRelease;
                     @Release.performed += instance.OnRelease;
                     @Release.canceled += instance.OnRelease;
+                    @ReleaseEditor.started += instance.OnReleaseEditor;
+                    @ReleaseEditor.performed += instance.OnReleaseEditor;
+                    @ReleaseEditor.canceled += instance.OnReleaseEditor;
                 }
             }
         }
@@ -298,6 +327,7 @@ namespace Arcanoid
             void OnMovement1(InputAction.CallbackContext context);
             void OnMovement2(InputAction.CallbackContext context);
             void OnRelease(InputAction.CallbackContext context);
+            void OnReleaseEditor(InputAction.CallbackContext context);
         }
     }
 }

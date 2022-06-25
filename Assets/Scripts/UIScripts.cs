@@ -52,6 +52,7 @@ namespace Arcanoid
 
         private void PauseAction_performed(InputAction.CallbackContext obj)
         {
+            DebugToFile.Log("Pausing game");
             if (!_pausePanel.activeSelf)
             {
                 StartCoroutine(ShowPanelAnimation(_pausePanel));
@@ -63,6 +64,7 @@ namespace Arcanoid
         {
             StartCoroutine(HidePanelAnimation(_pausePanel));
             Time.timeScale = 1f;
+            DebugToFile.Log("Resume game");
         }
 
         public void OpenSettings()
@@ -90,7 +92,7 @@ namespace Arcanoid
 
         IEnumerator ChangePanelsAnimation(GameObject from, GameObject to)
         {
-            yield return HidePanelAnimation(from); 
+            yield return HidePanelAnimation(from);
             yield return ShowPanelAnimation(to);
         }
         IEnumerator HidePanelAnimation(GameObject tohide)
@@ -123,15 +125,11 @@ namespace Arcanoid
 
         public void CloseGame()
         {
-            if (Application.isEditor)
-            {
-                UnityEditor.EditorApplication.isPlaying = false;
-            }
-            else
-            {
-                Application.Quit();
-
-            }
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif     
         }
     }
 }

@@ -49,6 +49,7 @@ namespace Arcanoid
             _edgeScript2 = _edge2.GetComponent<EdgeScript>();
             _edgeScript2.EdgeTouch += _edgeScript_EdgeTouch;
 
+            DebugToFile.Log(DateTime.Now + ": Game starts");
             if (_boxes.Count < _maxBoxes)
             {
                 GenerateNew();
@@ -62,6 +63,13 @@ namespace Arcanoid
 
         }
 
+        private void OnApplicationQuit()
+        {
+            DebugToFile.Log(DateTime.Now + ": Exit Game");
+        }
+
+
+
         public void GenerateHarder()
         {
             Vector3 scale = _roomGenerator.EdgesTransform.localScale;
@@ -71,6 +79,7 @@ namespace Arcanoid
         }
         public void GenerateNew()
         {
+            DebugToFile.Log("Generating new level");
             _player1Health = _maxHealth;
             _player2Health = _maxHealth;
             CheckHealthAndFill();
@@ -81,7 +90,7 @@ namespace Arcanoid
 
         private void CheckHealthAndFill()
         {
-            if(_player1Health>0 && _player2Health > 0)
+            if (_player1Health > 0 && _player2Health > 0)
             {
                 ResetHealthForPlayer(_player1HealthPanel, _player1Health);
                 ResetHealthForPlayer(_player2HealthPanel, _player2Health);
@@ -94,14 +103,11 @@ namespace Arcanoid
 
         private static void CloseGame()
         {
-            if (Application.isEditor)
-            {
-                UnityEditor.EditorApplication.isPlaying = false;
-            }
-            else
-            {
-                Application.Quit();
-            }
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif            
         }
 
         private void ResetHealthForPlayer(GameObject healthPanel, int healthCount)
@@ -152,10 +158,13 @@ namespace Arcanoid
         {
             if (sender as EdgeScript == _edgeScript1)
             {
+
+                DebugToFile.Log("Player 1 got hit");
                 _player1Health--;
             }
             else
             {
+                DebugToFile.Log("Player 2 got hit");
                 _player2Health--;
             }
             CheckHealthAndFill();
